@@ -2,18 +2,14 @@
 
 import os
 import json
-import subprocess
-import time
-from pathlib import Path
 import shutil
 import logging
 import zipfile
-import os
+from pathlib import Path
+import pyinotify
 
-import inotify.adapters
 
-
-WATCH_DIR = "/home/drakari/pineapple/tmp";
+WATCH_DIR = "/home/drakari/pineapple/tmp"
 
 # Setup logging
 logging.basicConfig(
@@ -32,34 +28,6 @@ def unzip_file(zip_path, extract_to):
         zip_ref.extractall(extract_to)
         print(f"✅ Extracted '{zip_path}' to '{extract_to}'")
 
-def watch():
-    logging.info(f"Watching directory: {WATCH_DIR}")
-    inotifyFileChecker = inotify.adapters.Inotify()
-
-    inotifyFileChecker.add_watch(WATCH_DIR)
-
-    for event in inotifyFileChecker.event_gen(yield_nones=False):
-        (_, type_names, path, filename) = event
-        if "CREATE" in type_names:
-            full_path = os.path.join(path, filename)
-            logging.info(f"New file detected: {full_path}")
-            
-            #Get the run data
-            with open((os.path.join(path, "Bannana.json")), "r") as data:
-                config = json.load(data)
-            command = config.get("command")
-            match(command):
-                case 0:
-                     
-                    saveStudentGame()
-                    break
-                case 1:
-                    #command 2
-                    break
-                case 2:
-                    #command 3
-                    break
-
 def saveStudentGame(path, collectionName, gameName, system):
     romPath = os.path.join("/home/drakari/roms/", collectionName)
     gameDataPath = os.path.join("/home/drakari/gamedata", collectionName)
@@ -72,6 +40,44 @@ def saveStudentGame(path, collectionName, gameName, system):
 
     return
 
+class EventHandler(pyinotify.ProcessEvent):
+    def process_IN_CREATE(self, event):
+        full_path = event.pathname
+        logging.info(f"New file detected: {full_path}")
+
+        try:
+            # Load the config from Bannana.json in the same directory
+            config_path = os.path.join(WATCH_DIR, "Bannana.json")
+            with open(config_path, "r") as f:
+                config = json.load(f)
+
+            command = config.get("command")
+            match command:
+                case 0:
+                    # You'll need to pass in actual values here
+                    saveStudentGame(
+                        path=None,  # Placeholder — update as needed
+                        collectionName=config.get("collection", "default_collection"),
+                        gameName=config.get("gameName", "default_game"),
+                        system=config.get("system", "default_system")
+                    )
+                case 1:
+                    logging.info("Command 1 triggered.")
+                case 2:
+                    logging.info("Command 2 triggered.")
+        except Exception as e:
+            logging.exception(f"Error handling new file: {e}")
+
+def watch():
+    logging.info(f"Watching directory: {WATCH_DIR}")
+    wm = pyinotify.WatchManager()
+    mask = pyinotify.IN_CREATE
+
+    handler = EventHandler()
+    notifier = pyinotify.Notifier(wm, handler)
+    wm.add_watch(WATCH_DIR, mask, rec=False)
+
+    notifier.loop()
 
 if __name__ == "__main__":
     try:
@@ -80,4 +86,3 @@ if __name__ == "__main__":
         logging.info("Bannana stopped by user.")
     except Exception as e:
         logging.exception(f"Bannana failed: {e}")
-
