@@ -48,21 +48,23 @@ class EventHandler(pyinotify.ProcessEvent):
         try:
             # Load the config from banana.json in the same directory
             config_path = os.path.join(WATCH_DIR, "banana_config.json")
-            with open(config_path, "r") as f:
-                config = json.load(f)
-
+            with open(config_path, "r") as file:
+                contents = file.read()
+                logging.load(f"Raw contents: {contents}")
+                config = json.load(file)
+                
             command = config.get("command")
             match command:
-                case 0:
+                case 1:
                     saveStudentGame(
                         collectionName=config.get("collection"),
                         gameName=config.get("gameName"),
                         studentGameEngine=config.get("studentGameEngine")
                     )
-                case 1:
-                    logging.info("Command 1 triggered.")
                 case 2:
                     logging.info("Command 2 triggered.")
+                case 3:
+                    logging.info("Command 3 triggered.")
         except Exception as e:
             logging.exception(f"Error handling new file: {e}")
 
