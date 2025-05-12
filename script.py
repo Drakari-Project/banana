@@ -50,9 +50,9 @@ class EventHandler(pyinotify.ProcessEvent):
             config_path = os.path.join(WATCH_DIR, "banana_config.json")
             with open(config_path, "r") as file:
                 contents = file.read()
-                logging.load(f"Raw contents: {contents}")
+                logging.info(f"Raw contents: {contents}")
                 config = json.load(file)
-                
+
             command = config.get("command")
             match command:
                 case 1:
