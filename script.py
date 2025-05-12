@@ -13,7 +13,7 @@ WATCH_DIR = "/home/drakari/pineapple/tmp"
 
 # Setup logging
 logging.basicConfig(
-    filename="bannana.log",
+    filename="banana.log",
     level=logging.INFO,
     format="%(asctime)s - %(message)s",
 )
@@ -28,11 +28,11 @@ def unzip_file(zip_path, extract_to):
         zip_ref.extractall(extract_to)
         print(f"✅ Extracted '{zip_path}' to '{extract_to}'")
 
-def saveStudentGame(path, collectionName, gameName, system):
+def saveStudentGame(collectionName, gameName, studentGameEngine):
     romPath = os.path.join("/home/drakari/roms/", collectionName)
-    gameDataPath = os.path.join("/home/drakari/gamedata", collectionName)
+    gameDataPath = os.path.join("/home/drakari/gamedata/", collectionName)
     
-    Path(romPath).mkdir(parents=True, exist_ok=True)
+    Path(romPath).mkdir(parents=True, exist_ok=True)ƒ
     Path(gameDataPath).mkdir(parents=True, exist_ok=True)
     
     shutil.move("/home/drakari/pineapple/static/upload/game.zip", gameDataPath)
@@ -46,20 +46,18 @@ class EventHandler(pyinotify.ProcessEvent):
         logging.info(f"New file detected: {full_path}")
 
         try:
-            # Load the config from Bannana.json in the same directory
-            config_path = os.path.join(WATCH_DIR, "Bannana.json")
+            # Load the config from banana.json in the same directory
+            config_path = os.path.join(WATCH_DIR, "banana_config.json")
             with open(config_path, "r") as f:
                 config = json.load(f)
 
             command = config.get("command")
             match command:
                 case 0:
-                    # You'll need to pass in actual values here
                     saveStudentGame(
-                        path=None,  # Placeholder — update as needed
-                        collectionName=config.get("collection", "default_collection"),
-                        gameName=config.get("gameName", "default_game"),
-                        system=config.get("system", "default_system")
+                        collectionName=config.get("collection"),
+                        gameName=config.get("gameName"),
+                        studentGameEngine=config.get("studentGameEngine")
                     )
                 case 1:
                     logging.info("Command 1 triggered.")
@@ -83,6 +81,6 @@ if __name__ == "__main__":
     try:
         watch()
     except KeyboardInterrupt:
-        logging.info("Bannana stopped by user.")
+        logging.info("banana stopped by user.")
     except Exception as e:
-        logging.exception(f"Bannana failed: {e}")
+        logging.exception(f"banana failed: {e}")
