@@ -32,7 +32,7 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
     romPath = os.path.join("/home/drakari/roms/", collectionName)
     gameDataPath = os.path.join("/home/drakari/gamedata/", collectionName)
     
-    Path(romPath).mkdir(parents=True, exist_ok=True)ƒ
+    Path(romPath).mkdir(parents=True, exist_ok=True)
     Path(gameDataPath).mkdir(parents=True, exist_ok=True)
     
     shutil.move("/home/drakari/pineapple/static/upload/game.zip", gameDataPath)
