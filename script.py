@@ -52,6 +52,7 @@ class EventHandler(pyinotify.ProcessEvent):
             with open(config_path, "r") as file:
                 contents = file.read()
                 logging.info(f"File content: {repr(contents)}")
+                file.seek(0)
                 config = json.load(file)
 
             command = config.get("command")
