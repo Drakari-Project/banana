@@ -48,6 +48,7 @@ class EventHandler(pyinotify.ProcessEvent):
         try:
             # Load the config from banana.json in the same directory
             config_path = os.path.join(WATCH_DIR, "banana_config.json")
+            logging.info({config_path})
             with open(config_path, "r") as file:
                 contents = file.read()
                 logging.info(f"Raw contents: {contents}")
