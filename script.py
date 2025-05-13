@@ -44,17 +44,16 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_IN_CREATE(self, event):
         full_path = event.pathname
         logging.info(f"New file detected: {full_path}")
-
+        command
         try:
             # Load the config from banana.json in the same directory
             config_path = '/home/drakari/pineapple/tmp/banana_config.json'
             logging.info(config_path)
             with open(config_path, "r") as file:
                 contents = file.read()
-                logging.info(f"File content: {contents}")
-                file.seek(0)
-                config = json.loads(contents)
-            command = config.get("command")
+                logging.info(f"File content: {repr(contents)}")
+                config = json.loads(content)
+                command = config.get("command")
             match command:
                 case 1:
                     saveStudentGame(
