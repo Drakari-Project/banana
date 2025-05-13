@@ -50,11 +50,7 @@ class EventHandler(pyinotify.ProcessEvent):
             config_path = '/home/drakari/pineapple/tmp/banana_config.json'
             logging.info(config_path)
             with open(config_path, "r") as file:
-                contents = file.read()
-                logging.info(f"File content: {contents}")
-                file.seek(0)
-                config = json.loads(file)
-
+                config = json.loads(file.read())
             command = config.get("command")
             match command:
                 case 1:
