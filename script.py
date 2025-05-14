@@ -10,7 +10,8 @@ import pyinotify
 
 
 WATCH_DIR = "/home/drakari/pineapple/tmp"
-
+command = 0
+config = 0
 # Setup logging
 logging.basicConfig(
     filename="banana.log",
@@ -44,15 +45,16 @@ class EventHandler(pyinotify.ProcessEvent):
     def process_IN_CREATE(self, event):
         full_path = event.pathname
         logging.info(f"New file detected: {full_path}")
-        command
         try:
             # Load the config from banana.json in the same directory
             config_path = '/home/drakari/pineapple/tmp/banana_config.json'
             logging.info(config_path)
             with open(config_path, "r") as file:
+                global command 
+                global config
                 contents = file.read()
                 logging.info(f"File content: {repr(contents)}")
-                config = json.loads(content)
+                config = json.loads(contents)
                 command = config.get("command")
             match command:
                 case 1:
