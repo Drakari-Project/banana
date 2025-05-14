@@ -10,7 +10,7 @@ import pyinotify
 import time
 
 
-WATCH_DIR = "/home/drakari/pineapple/tmp"
+WATCH_DIR = "/home/drakari/pineapple/static/uploads/"
 command = None
 config = None
 config_path = '/home/drakari/pineapple/static/uploads/banana_config.json'
