@@ -22,6 +22,24 @@ logging.basicConfig(
 
 Path(WATCH_DIR).mkdir(parents=True, exist_ok=True)
 
+def wait_until_file_is_stable(path, timeout=10, interval=0.5):
+    """Wait until file is no longer changing in size."""
+    start_time = time.time()
+    last_size = -1
+
+    while time.time() - start_time < timeout:
+        try:
+            current_size = os.path.getsize(path)
+        except FileNotFoundError:
+            current_size = -1  # File might not exist yet
+
+        if current_size == last_size and current_size > 0:
+            return True  # File is done uploading
+        last_size = current_size
+        time.sleep(interval)
+
+    return False
+
 def unzip_file(zip_path, extract_to):
     if not zipfile.is_zipfile(zip_path):
         return
@@ -50,6 +68,7 @@ class EventHandler(pyinotify.ProcessEvent):
             time.sleep(1)
             config_path = '/home/drakari/pineapple/tmp/banana_config.json'
             logging.info(config_path)
+            wait_until_file_is_stable(full_path)
             with open(config_path, "r") as file:
                 global command 
                 global config
