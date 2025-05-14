@@ -82,7 +82,7 @@ class EventHandler(pyinotify.ProcessEvent):
                     logging.info(f"Command 1 triggered.")
                     saveStudentGame(
                         collectionName=config["collection"],
-                        gameName=config["gameName"],
+                        gameName=config["name"],
                         studentGameEngine=config["studentGameEngine"]
                     )
                 case 2:
