@@ -7,6 +7,7 @@ import logging
 import zipfile
 from pathlib import Path
 import pyinotify
+import time
 
 
 WATCH_DIR = "/home/drakari/pineapple/tmp"
@@ -46,7 +47,7 @@ class EventHandler(pyinotify.ProcessEvent):
         full_path = event.pathname
         logging.info(f"New file detected: {full_path}")
         try:
-            # Load the config from banana.json in the same directory
+            time.sleep(1)
             config_path = '/home/drakari/pineapple/tmp/banana_config.json'
             logging.info(config_path)
             with open(config_path, "r") as file:
