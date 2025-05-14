@@ -76,6 +76,7 @@ class EventHandler(pyinotify.ProcessEvent):
                 logging.info(f"File content: {repr(contents)}")
                 config = json.loads(contents)
                 command = config.get("command")
+                logging.info(f"Here is the command that is running:{command}")
             match command:
                 case 1:
                     logging.info(f"Running command 1")
