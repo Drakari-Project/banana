@@ -77,7 +77,7 @@ class EventHandler(pyinotify.ProcessEvent):
                 config = json.loads(contents)
                 command = config.get("command")
                 logging.info(f"Here is the command that is running:{command}")
-            match command:
+            match int(command):
                 case 1:
                     logging.info(f"Running command 1")
                     saveStudentGame(
