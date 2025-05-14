@@ -10,8 +10,8 @@ import pyinotify
 
 
 WATCH_DIR = "/home/drakari/pineapple/tmp"
-command = 0
-config = 0
+command = None
+config = None
 # Setup logging
 logging.basicConfig(
     filename="banana.log",
