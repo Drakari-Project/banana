@@ -13,6 +13,7 @@ import time
 WATCH_DIR = "/home/drakari/pineapple/tmp"
 command = None
 config = None
+config_path = '/home/drakari/pineapple/static/uploads/banana_config.json'
 # Setup logging
 logging.basicConfig(
     filename="banana.log",
@@ -22,8 +23,7 @@ logging.basicConfig(
 
 Path(WATCH_DIR).mkdir(parents=True, exist_ok=True)
 
-def wait_until_file_is_stable(path, timeout=10, interval=0.5):
-    """Wait until file is no longer changing in size."""
+def wait_until_file_size_is_stable(path, timeout=10, interval=0.5):
     start_time = time.time()
     last_size = -1
 
@@ -55,7 +55,7 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
     Path(romPath).mkdir(parents=True, exist_ok=True)
     Path(gameDataPath).mkdir(parents=True, exist_ok=True)
     
-    shutil.move("/home/drakari/pineapple/static/upload/game.zip", gameDataPath)
+    shutil.move("/home/drakari/pineapple/static/uploads/game.zip", gameDataPath)
     unzip_file(os.path.join(gameDataPath, "game.zip"), gameDataPath)
 
     return
@@ -66,24 +66,24 @@ class EventHandler(pyinotify.ProcessEvent):
         logging.info(f"New file detected: {full_path}")
         try:
             time.sleep(1)
-            config_path = '/home/drakari/pineapple/tmp/banana_config.json'
             logging.info(config_path)
-            wait_until_file_is_stable(full_path)
+            wait_until_file_size_is_stable(full_path)
             with open(config_path, "r") as file:
                 global command 
                 global config
+
                 contents = file.read()
                 logging.info(f"File content: {repr(contents)}")
+
                 config = json.loads(contents)
                 command = config.get("command")
-                logging.info(f"Here is the command that is running:{command}")
             match int(command):
                 case 1:
-                    logging.info(f"Running command 1")
+                    logging.info(f"Command 1 triggered.")
                     saveStudentGame(
-                        collectionName=config.get("collection"),
-                        gameName=config.get("gameName"),
-                        studentGameEngine=config.get("studentGameEngine")
+                        collectionName=config["collection"],
+                        gameName=config["gameName"],
+                        studentGameEngine=config["studentGameEngine"]
                     )
                 case 2:
                     logging.info("Command 2 triggered.")
