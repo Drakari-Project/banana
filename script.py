@@ -43,14 +43,6 @@ def wait_until_file_size_is_stable(path, timeout=10, interval=0.5):
 
     return False
 
-# def unzip_file(zip_path, extract_to):
-#     if not zipfile.is_zipfile(zip_path):
-#         return
-
-#     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-#         zip_ref.extractall(extract_to)
-#         logging.info(f"✅ Extracted '{zip_path}' to '{extract_to}'")
-
 def unzip_and_get_inner_folder(zip_path, extract_to=None):
     if extract_to is None:
         extract_to = os.path.splitext(zip_path)[0]
@@ -160,7 +152,7 @@ class EventHandler(pyinotify.ProcessEvent):
                     saveStudentGame(
                         collectionName=config["collection"],
                         gameName=config["gameName"],
-                        studentGameEngine=config["studentGameEngine"]
+                        studentGameEngine=config["studentGameEngine"],
                         exeName=config["exeName"]
                     )
                 case 2:
