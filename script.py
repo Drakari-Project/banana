@@ -95,16 +95,16 @@ def saveStudentGame(collectionName, gameName, studentGameEngine, exeName):
             systemPath = '/home/drakari/systems/jre'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
 
-            os.symlink(os.path.join(innerFolder, exeName), os.path.join(systemPath, gameName))
-            os.symlink(os.path.join(systemPath, gameName), os.path.join(romPath, gameName))
+            os.symlink(os.path.join(innerFolder, exeName), os.path.join(systemPath, f"{gameName}.game"))
+            os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
             
         case "native":
             logging.info("It's native")
             systemPath = '/home/drakari/systems/native'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
 
-            os.symlink(os.path.join(innerFolder, exeName), os.path.join(systemPath, gameName))
-            os.symlink(os.path.join(systemPath, gameName), os.path.join(romPath, gameName))
+            os.symlink(os.path.join(innerFolder, exeName), os.path.join(systemPath, f"{gameName}.game"))
+            os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
     
     #TODO Add xml interface stuff, thats kinda it I think
     
