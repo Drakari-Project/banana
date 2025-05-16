@@ -71,8 +71,8 @@ def unzip_and_get_inner_folder(zip_path, extract_to=None):
 
 def saveStudentGame(collectionName, gameName, studentGameEngine):
     global config
-    romPath = os.path.join("/home/drakari/roms/", collectionName)
-    gameDataPath = os.path.join("/home/drakari/gamedata/", collectionName)
+    romPath = os.path.join("/home/drakari/roms/", collectionName.replace(" ", "_"))
+    gameDataPath = os.path.join("/home/drakari/gamedata/", collectionName.replace(" ", "_"))
     
     Path(romPath).mkdir(parents=True, exist_ok=True)
     Path(gameDataPath).mkdir(parents=True, exist_ok=True)
@@ -129,6 +129,28 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
     XML.SubElement(game, "developer").text = config["dev"]
    
     root.append(game)
+
+    xml_str = XML.tostring(root, encoding="utf-8")
+    
+    parsed = minidom.parseString(xml_str)
+    with open(xmlFile, "w", encoding="utf-8") as file:
+        file.write(parsed.toprettyxml(indent="  "))
+    #System file
+    xmlPath = f"/home/drakari/ES-DE/custom_systems/es_systems.xml"
+
+    Path(xmlPath).mkdir(parents=True, exist_ok=True)
+    
+    tree = XML.parse(xmlFile)
+    root = tree.getroot()
+
+    system = XML.Element("system")
+    XML.SubElement(system, "name").text = collectionName.replace(" ", "_")
+    XML.SubElement(system, "fullname").text = collectionName
+    XML.SubElement(system, "path").text = f"%ROMPATH%/{collectionName.replace(" ", "_")}"
+    XML.SubElement(system, "extension").text = ".game"
+    XML.SubElement(system, "command").text = "/usr/bin/bash /home/drakari/launchers/launch.bash %ROM%"
+   
+    root.append(system)
 
     xml_str = XML.tostring(root, encoding="utf-8")
     
