@@ -4,12 +4,12 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/env python3 /home/drakari/pineapple/banana.py
-WorkingDirectory=/home/drakari/pineapple
+ExecStart=/usr/bin/env python3 /home/drakari/banana/script.py
+WorkingDirectory=/home/drakari/banana
 Restart=always
 RestartSec=3
-StandardOutput=append:/home/drakari/banana_stdout.log
-StandardError=append:/home/drakari/banana_stderr.log
+StandardOutput=append:/home/drakari/banana/banana_stdout.log
+StandardError=append:/home/drakari/banana/banana_stderr.log
 User=drakari
 Group=drakari
 
