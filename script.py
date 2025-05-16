@@ -68,7 +68,7 @@ def unzip_and_get_inner_folder(zip_path, extract_to=None):
         # If there's no single top-level folder, return the full extract path
         return extract_to
 
-def saveStudentGame(collectionName, gameName, studentGameEngine, exeName):
+def saveStudentGame(collectionName, gameName, studentGameEngine):
     romPath = os.path.join("/home/drakari/roms/", collectionName)
     gameDataPath = os.path.join("/home/drakari/gamedata/", collectionName)
     
@@ -94,29 +94,37 @@ def saveStudentGame(collectionName, gameName, studentGameEngine, exeName):
             logging.info("It's Java")
             systemPath = '/home/drakari/systems/jre'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
+            global config
 
-            os.symlink(os.path.join(innerFolder, exeName), os.path.join(systemPath, f"{gameName}.game"))
+            os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game"))
             os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
             
         case "native":
             logging.info("It's native")
             systemPath = '/home/drakari/systems/native'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
+            global config
 
-            os.symlink(os.path.join(innerFolder, exeName), os.path.join(systemPath, f"{gameName}.game"))
+            os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game"))
             os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
     
     #TODO Add xml interface stuff, thats kinda it I think
     
+    global config
     xmlPath = f"/home/drakari/ES-DE/gamelists/{collectionName}/"
     xmlFile = os.path.join(xmlPath, "gamelist.xml")
 
     Path(xmlPath).mkdir(parents=True, exist_ok=True)
     
-    tree = XML.parse(xmlFile)
-    root = tree.getroot()
+    if os.path.exists(xmlFile):
+        tree = XML.parse(xmlFile)
+        root = tree.getroot()
+    else:
+        root = XML.Element("gameList")  # Create root element
+        tree = XML.ElementTree(root)
+        tree.write(xmlFile, encoding="utf-8", xml_declaration=True)  # Save the empty XML file
+
     game = XML.Element("game")
-    global config
     XML.SubElement(game, "path").text = f"./{gameName}.game"
     XML.SubElement(game, "name").text = f"{gameName}"
     XML.SubElement(game, "desc").text = config["desc"]
@@ -155,8 +163,7 @@ class EventHandler(pyinotify.ProcessEvent):
                     saveStudentGame(
                         collectionName=config["collection"],
                         gameName=config["gameName"],
-                        studentGameEngine=config["studentGameEngine"],
-                        exeName=config["exeName"]
+                        studentGameEngine=config["studentGameEngine"]
                     )
                 case 2:
                     logging.info("Command 2 triggered.")
