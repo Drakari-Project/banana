@@ -123,7 +123,7 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
         tree.write(xmlFile, encoding="utf-8", xml_declaration=True)  # Save the empty XML file
 
     game = XML.Element("game")
-    XML.SubElement(game, "path").text = f"./{gameName}.game"
+    XML.SubElement(game, "path").text = f"./{gameName}.game".replace(" ", "_")
     XML.SubElement(game, "name").text = f"{gameName}"
     XML.SubElement(game, "desc").text = config["desc"]
     XML.SubElement(game, "developer").text = config["dev"]
