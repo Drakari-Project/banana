@@ -8,12 +8,15 @@ import zipfile
 from pathlib import Path
 import pyinotify
 import time
+import xml.etree.ElementTree as XML
+from xml.dom import minidom
 
 
 WATCH_DIR = "/home/drakari/pineapple/static/uploads/"
 command = None
 config = None
 config_path = '/home/drakari/pineapple/static/uploads/banana_config.json'
+
 # Setup logging
 logging.basicConfig(
     filename="banana.log",
@@ -40,15 +43,40 @@ def wait_until_file_size_is_stable(path, timeout=10, interval=0.5):
 
     return False
 
-def unzip_file(zip_path, extract_to):
-    if not zipfile.is_zipfile(zip_path):
-        return
+# def unzip_file(zip_path, extract_to):
+#     if not zipfile.is_zipfile(zip_path):
+#         return
 
+#     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+#         zip_ref.extractall(extract_to)
+#         logging.info(f"✅ Extracted '{zip_path}' to '{extract_to}'")
+
+def unzip_and_get_inner_folder(zip_path, extract_to=None):
+    if extract_to is None:
+        extract_to = os.path.splitext(zip_path)[0]
+
+    # Extract all files
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(extract_to)
-        print(f"✅ Extracted '{zip_path}' to '{extract_to}'")
+        # Get all top-level directories from the ZIP
+        names = zip_ref.namelist()
 
-def saveStudentGame(collectionName, gameName, studentGameEngine):
+    # Find the top-level folder(s)
+    top_dirs = set()
+    for name in names:
+        parts = name.split('/')
+        if parts[0]:  # skip empty strings
+            top_dirs.add(parts[0])
+    
+    if len(top_dirs) == 1:
+        inner_folder = os.path.join(extract_to, top_dirs.pop())
+        logging.info(f"✅ Extracted '{zip_path}' to '{inner_folder}'")
+        return inner_folder
+    else:
+        # If there's no single top-level folder, return the full extract path
+        return extract_to
+
+def saveStudentGame(collectionName, gameName, studentGameEngine, exeName):
     romPath = os.path.join("/home/drakari/roms/", collectionName)
     gameDataPath = os.path.join("/home/drakari/gamedata/", collectionName)
     
@@ -56,7 +84,56 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
     Path(gameDataPath).mkdir(parents=True, exist_ok=True)
     
     shutil.move("/home/drakari/pineapple/static/uploads/game.zip", gameDataPath)
-    unzip_file(os.path.join(gameDataPath, "game.zip"), gameDataPath)
+
+    whereToMoveGame = os.path.join(gameDataPath, "game.zip")
+
+    innerFolder = unzip_and_get_inner_folder(whereToMoveGame, gameDataPath)
+    os.remove(whereToMoveGame)
+
+    match studentGameEngine:
+        case "code.org":
+            logging.info("It's code.org")
+            systemPath = '/home/drakari/systems/code.org'
+            Path(systemPath).mkdir(parents=True, exist_ok=True)
+
+            os.symlink(innerFolder, os.path.join(systemPath, gameName))
+            os.symlink(os.path.join(systemPath, gameName), os.path.join(romPath, gameName))
+        case "java":
+            logging.info("It's Java")
+            systemPath = '/home/drakari/systems/jre'
+            Path(systemPath).mkdir(parents=True, exist_ok=True)
+
+            os.symlink(os.path.join(innerFolder, exeName), os.path.join(systemPath, gameName))
+            os.symlink(os.path.join(systemPath, gameName), os.path.join(romPath, gameName))
+            
+        case "native":
+            logging.info("It's native")
+            systemPath = '/home/drakari/systems/native'
+            Path(systemPath).mkdir(parents=True, exist_ok=True)
+
+            os.symlink(os.path.join(innerFolder, exeName), os.path.join(systemPath, gameName))
+            os.symlink(os.path.join(systemPath, gameName), os.path.join(romPath, gameName))
+    
+    #TODO Add xml interface stuff, thats kinda it I think
+    
+    xmlFile = '/home/drakari/ES-DE/gamelists/{collectionName}/gamelist.xml'
+
+    tree = XML.parse(xmlFile)
+    root = tree.getroot()
+    game = XML.Element("game")
+    global config
+    XML.SubElement(game, "path").text = "./{gameName}.game"
+    XML.SubElement(game, "name").text = "{gameName}"
+    XML.SubElement(game, "desc").text = config["desc"]
+    XML.SubElement(game, "developer").text = config["dev"]
+   
+    root.append(game)
+
+    xml_str = XML.tostring(root, encoding="utf-8")
+    
+    parsed = minidom.parseString(xml_str)
+    with open(xmlFile, "w", encoding="utf-8") as file:
+        file.write(parsed.toprettyxml(indent="  "))
 
     return
 
@@ -82,8 +159,9 @@ class EventHandler(pyinotify.ProcessEvent):
                     logging.info(f"Command 1 triggered.")
                     saveStudentGame(
                         collectionName=config["collection"],
-                        gameName=config["name"],
+                        gameName=config["gameName"],
                         studentGameEngine=config["studentGameEngine"]
+                        exeName=config["exeName"]
                     )
                 case 2:
                     logging.info("Command 2 triggered.")
