@@ -69,6 +69,7 @@ def unzip_and_get_inner_folder(zip_path, extract_to=None):
         return extract_to
 
 def saveStudentGame(collectionName, gameName, studentGameEngine):
+    global config
     romPath = os.path.join("/home/drakari/roms/", collectionName)
     gameDataPath = os.path.join("/home/drakari/gamedata/", collectionName)
     
@@ -94,7 +95,6 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
             logging.info("It's Java")
             systemPath = '/home/drakari/systems/jre'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
-            global config
 
             os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game"))
             os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
@@ -103,14 +103,12 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
             logging.info("It's native")
             systemPath = '/home/drakari/systems/native'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
-            global config
 
             os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game"))
             os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
     
     #TODO Add xml interface stuff, thats kinda it I think
     
-    global config
     xmlPath = f"/home/drakari/ES-DE/gamelists/{collectionName}/"
     xmlFile = os.path.join(xmlPath, "gamelist.xml")
 
