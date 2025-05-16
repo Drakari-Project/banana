@@ -1,0 +1,18 @@
+[Unit]
+Description=Banana Game Upload Watcher
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env python3 /home/drakari/pineapple/banana.py
+WorkingDirectory=/home/drakari/pineapple
+Restart=always
+RestartSec=3
+StandardOutput=append:/home/drakari/banana_stdout.log
+StandardError=append:/home/drakari/banana_stderr.log
+User=drakari
+Group=drakari
+
+[Install]
+WantedBy=multi-user.target
+

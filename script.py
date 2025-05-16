@@ -10,6 +10,7 @@ import pyinotify
 import time
 import xml.etree.ElementTree as XML
 from xml.dom import minidom
+import sys
 
 
 WATCH_DIR = "/home/drakari/pineapple/static/uploads/"
@@ -107,7 +108,6 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
             os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game"))
             os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
     
-    #TODO Add xml interface stuff, thats kinda it I think
     
     xmlPath = f"/home/drakari/ES-DE/gamelists/{collectionName}/"
     xmlFile = os.path.join(xmlPath, "gamelist.xml")
@@ -167,8 +167,10 @@ class EventHandler(pyinotify.ProcessEvent):
                     logging.info("Command 2 triggered.")
                 case 3:
                     logging.info("Command 3 triggered.")
+            sys.exit(0)
         except Exception as e:
             logging.exception(f"Error handling new file: {e}")
+        
 
 def watch():
     logging.info(f"Watching directory: {WATCH_DIR}")
@@ -188,3 +190,4 @@ if __name__ == "__main__":
         logging.info("banana stopped by user.")
     except Exception as e:
         logging.exception(f"banana failed: {e}")
+        sys.exit(1)
