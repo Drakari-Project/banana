@@ -90,23 +90,23 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
             systemPath = '/home/drakari/systems/code.org'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
 
-            os.symlink(innerFolder, os.path.join(systemPath, f"{gameName}.game"))
-            os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
+            os.symlink(innerFolder, os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")))
+            os.symlink(os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")), os.path.join(romPath, f"{gameName}.game".replace(" ", "_")))
         case "java":
             logging.info("It's Java")
             systemPath = '/home/drakari/systems/jre'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
 
-            os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game"))
-            os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
+            os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game").replace(" ", "_"))
+            os.symlink(os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")), os.path.join(romPath, f"{gameName}.game").replace(" ", "_"))
             
         case "native":
             logging.info("It's native")
             systemPath = '/home/drakari/systems/native'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
 
-            os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game"))
-            os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
+            os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")))
+            os.symlink(os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")), os.path.join(romPath, f"{gameName}.game".replace(" ", "_")))
     
     
     xmlPath = f"/home/drakari/ES-DE/gamelists/{collectionName}/"
