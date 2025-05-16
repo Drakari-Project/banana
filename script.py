@@ -167,6 +167,7 @@ class EventHandler(pyinotify.ProcessEvent):
                     logging.info("Command 2 triggered.")
                 case 3:
                     logging.info("Command 3 triggered.")
+            os.remove(config_path)
             sys.exit(0)
         except Exception as e:
             logging.exception(f"Error handling new file: {e}")
