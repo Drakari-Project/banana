@@ -108,14 +108,14 @@ def saveStudentGame(collectionName, gameName, studentGameEngine, exeName):
     
     #TODO Add xml interface stuff, thats kinda it I think
     
-    xmlFile = '/home/drakari/ES-DE/gamelists/{collectionName}/gamelist.xml'
+    xmlFile = f"/home/drakari/ES-DE/gamelists/{collectionName}/gamelist.xml"
 
     tree = XML.parse(xmlFile)
     root = tree.getroot()
     game = XML.Element("game")
     global config
-    XML.SubElement(game, "path").text = "./{gameName}.game"
-    XML.SubElement(game, "name").text = "{gameName}"
+    XML.SubElement(game, "path").text = f"./{gameName}.game"
+    XML.SubElement(game, "name").text = f"{gameName}"
     XML.SubElement(game, "desc").text = config["desc"]
     XML.SubElement(game, "developer").text = config["dev"]
    
