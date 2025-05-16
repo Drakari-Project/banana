@@ -136,9 +136,7 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
     with open(xmlFile, "w", encoding="utf-8") as file:
         file.write(parsed.toprettyxml(indent="  "))
     #System file
-    xmlPath = f"/home/drakari/ES-DE/custom_systems/es_systems.xml"
-
-    Path(xmlPath).mkdir(parents=True, exist_ok=True)
+    xmlFile = f"/home/drakari/ES-DE/custom_systems/es_systems.xml"
     
     tree = XML.parse(xmlFile)
     root = tree.getroot()
