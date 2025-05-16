@@ -88,8 +88,8 @@ def saveStudentGame(collectionName, gameName, studentGameEngine, exeName):
             systemPath = '/home/drakari/systems/code.org'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
 
-            os.symlink(innerFolder, os.path.join(systemPath, gameName))
-            os.symlink(os.path.join(systemPath, gameName), os.path.join(romPath, gameName))
+            os.symlink(innerFolder, os.path.join(systemPath, f"{gameName}.game"))
+            os.symlink(os.path.join(systemPath, f"{gameName}.game"), os.path.join(romPath, f"{gameName}.game"))
         case "java":
             logging.info("It's Java")
             systemPath = '/home/drakari/systems/jre'
@@ -108,8 +108,11 @@ def saveStudentGame(collectionName, gameName, studentGameEngine, exeName):
     
     #TODO Add xml interface stuff, thats kinda it I think
     
-    xmlFile = f"/home/drakari/ES-DE/gamelists/{collectionName}/gamelist.xml"
+    xmlPath = f"/home/drakari/ES-DE/gamelists/{collectionName}/"
+    xmlFile = os.path.join(xmlPath, "gamelist.xml")
 
+    Path(xmlPath).mkdir(parents=True, exist_ok=True)
+    
     tree = XML.parse(xmlFile)
     root = tree.getroot()
     game = XML.Element("game")
