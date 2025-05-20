@@ -51,22 +51,21 @@ def unzip_and_get_inner_folder(zip_path, extract_to=None):
     # Extract all files
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(extract_to)
-        # Get all top-level directories from the ZIP
         names = zip_ref.namelist()
 
-    # Find the top-level folder(s)
+    # Get top-level folders, ignoring __MACOSX and empty entries
     top_dirs = set()
     for name in names:
         parts = name.split('/')
-        if parts[0]:  # skip empty strings
+        if parts[0] and parts[0] != "__MACOSX":
             top_dirs.add(parts[0])
-    
+
     if len(top_dirs) == 1:
         inner_folder = os.path.join(extract_to, top_dirs.pop())
         logging.info(f"✅ Extracted '{zip_path}' to '{inner_folder}'")
         return inner_folder
     else:
-        # If there's no single top-level folder, return the full extract path
+        logging.info(f"⚠️ Extracted '{zip_path}' to '{extract_to}' (multiple folders)")
         return extract_to
     
 def saveGameListXML(collectionName, gameName):
