@@ -172,6 +172,8 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
             Path(systemPath).mkdir(parents=True, exist_ok=True)
 
             logging.info(innerFolder)
+
+            os.chmod(os.path.join(innerFolder, config["exeName"]), 0o755)
             os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game").replace(" ", "_"))
             os.symlink(os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")), os.path.join(romPath, f"{gameName}.game").replace(" ", "_"))
             
@@ -181,6 +183,8 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
             Path(systemPath).mkdir(parents=True, exist_ok=True)
 
             logging.info(innerFolder)
+
+            os.chmod(os.path.join(innerFolder, config["exeName"]), 0o755)
             os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")))
             os.symlink(os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")), os.path.join(romPath, f"{gameName}.game".replace(" ", "_")))
     
