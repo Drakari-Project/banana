@@ -93,8 +93,13 @@ def saveGameListXML(collectionName, gameName):
     xml_str = XML.tostring(root, encoding="utf-8")
     
     parsed = minidom.parseString(xml_str)
+    
+    pretty_xml = parsed.toprettyxml(indent="  ")
+    # Remove lines that are just whitespace
+    pretty_xml = "\n".join([line for line in pretty_xml.splitlines() if line.strip()])
+
     with open(xmlFile, "w", encoding="utf-8") as file:
-        file.write(parsed.toprettyxml(indent="  "))
+        file.write(pretty_xml)
     return
 
 def saveSystemListXML(collectionName):
@@ -129,8 +134,13 @@ def saveSystemListXML(collectionName):
     xml_str = XML.tostring(root, encoding="utf-8")
     
     parsed = minidom.parseString(xml_str)
+
+    pretty_xml = parsed.toprettyxml(indent="  ")
+    # Remove lines that are just whitespace
+    pretty_xml = "\n".join([line for line in pretty_xml.splitlines() if line.strip()])
+
     with open(xmlFile, "w", encoding="utf-8") as file:
-        file.write(parsed.toprettyxml(indent="  "))
+        file.write(pretty_xml)
     return
 
 def saveStudentGame(collectionName, gameName, studentGameEngine):
