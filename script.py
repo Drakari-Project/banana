@@ -54,6 +54,21 @@ def unzip_and_get_inner_folder(zip_path, extract_to=None):
         # Get all top-level directories from the ZIP
         names = zip_ref.namelist()
 
+    # Find the top-level folder(s)
+    top_dirs = set()
+    for name in names:
+        parts = name.split('/')
+        if parts[0]:  # skip empty strings
+            top_dirs.add(parts[0])
+    
+    if len(top_dirs) == 1:
+        inner_folder = os.path.join(extract_to, top_dirs.pop())
+        logging.info(f"✅ Extracted '{zip_path}' to '{inner_folder}'")
+        return inner_folder
+    else:
+        # If there's no single top-level folder, return the full extract path
+        return extract_to
+    
 def saveGameListXML(collectionName, gameName):
     xmlPath = f"/home/drakari/ES-DE/gamelists/{collectionName}/"
     xmlFile = os.path.join(xmlPath, "gamelist.xml")
@@ -113,21 +128,6 @@ def saveSystemListXML(collectionName):
     with open(xmlFile, "w", encoding="utf-8") as file:
         file.write(parsed.toprettyxml(indent="  "))
     return
-
-    # Find the top-level folder(s)
-    top_dirs = set()
-    for name in names:
-        parts = name.split('/')
-        if parts[0]:  # skip empty strings
-            top_dirs.add(parts[0])
-    
-    if len(top_dirs) == 1:
-        inner_folder = os.path.join(extract_to, top_dirs.pop())
-        logging.info(f"✅ Extracted '{zip_path}' to '{inner_folder}'")
-        return inner_folder
-    else:
-        # If there's no single top-level folder, return the full extract path
-        return extract_to
 
 def saveStudentGame(collectionName, gameName, studentGameEngine):
     global config
