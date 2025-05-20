@@ -113,6 +113,11 @@ def saveSystemListXML(collectionName):
         tree = XML.ElementTree(root)
         tree.write(xmlFile, encoding="utf-8", xml_declaration=True)  # Save the empty XML file
 
+    for system in root.findall("system"):
+        name_element = system.find("name")
+        if name_element is not None and name_element.text == collectionName.replace(" ", "_"):
+            break
+
     system = XML.Element("system")
     XML.SubElement(system, "name").text = collectionName.replace(" ", "_")
     XML.SubElement(system, "fullname").text = collectionName
