@@ -54,6 +54,66 @@ def unzip_and_get_inner_folder(zip_path, extract_to=None):
         # Get all top-level directories from the ZIP
         names = zip_ref.namelist()
 
+def saveGameListXML(collectionName, gameName):
+    xmlPath = f"/home/drakari/ES-DE/gamelists/{collectionName}/"
+    xmlFile = os.path.join(xmlPath, "gamelist.xml")
+
+    Path(xmlPath).mkdir(parents=True, exist_ok=True)
+    
+    if os.path.exists(xmlFile):
+        tree = XML.parse(xmlFile)
+        root = tree.getroot()
+    else:
+        root = XML.Element("gameList")  # Create root element
+        tree = XML.ElementTree(root)
+        tree.write(xmlFile, encoding="utf-8", xml_declaration=True)  # Save the empty XML file
+
+    game = XML.Element("game")
+    XML.SubElement(game, "path").text = f"./{gameName}.game".replace(" ", "_")
+    XML.SubElement(game, "name").text = f"{gameName}"
+    XML.SubElement(game, "desc").text = config["desc"]
+    XML.SubElement(game, "developer").text = config["dev"]
+   
+    root.append(game)
+
+    xml_str = XML.tostring(root, encoding="utf-8")
+    
+    parsed = minidom.parseString(xml_str)
+    with open(xmlFile, "w", encoding="utf-8") as file:
+        file.write(parsed.toprettyxml(indent="  "))
+    return
+
+def saveSystemListXML(collectionName):
+    #System file
+    xmlPath = f"/home/drakari/ES-DE/custom_systems/"
+    xmlFile = f"/home/drakari/ES-DE/custom_systems/es_systems.xml"
+
+    Path(xmlPath).mkdir(parents=True, exist_ok=True)
+    
+    if os.path.exists(xmlFile):
+        tree = XML.parse(xmlFile)
+        root = tree.getroot()
+    else:
+        root = XML.Element("systemList")  # Create root element
+        tree = XML.ElementTree(root)
+        tree.write(xmlFile, encoding="utf-8", xml_declaration=True)  # Save the empty XML file
+
+    system = XML.Element("system")
+    XML.SubElement(system, "name").text = collectionName.replace(" ", "_")
+    XML.SubElement(system, "fullname").text = collectionName
+    XML.SubElement(system, "path").text = f"%ROMPATH%/{collectionName.replace(" ", "_")}"
+    XML.SubElement(system, "extension").text = ".game"
+    XML.SubElement(system, "command").text = "/usr/bin/bash /home/drakari/launchers/launch.bash %ROM%"
+   
+    root.append(system)
+
+    xml_str = XML.tostring(root, encoding="utf-8")
+    
+    parsed = minidom.parseString(xml_str)
+    with open(xmlFile, "w", encoding="utf-8") as file:
+        file.write(parsed.toprettyxml(indent="  "))
+    return
+
     # Find the top-level folder(s)
     top_dirs = set()
     for name in names:
@@ -108,53 +168,9 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
             os.symlink(os.path.join(innerFolder, config["exeName"]), os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")))
             os.symlink(os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")), os.path.join(romPath, f"{gameName}.game".replace(" ", "_")))
     
-    
-    xmlPath = f"/home/drakari/ES-DE/gamelists/{collectionName}/"
-    xmlFile = os.path.join(xmlPath, "gamelist.xml")
+    saveGameListXML(collectionName, gameName)
 
-    Path(xmlPath).mkdir(parents=True, exist_ok=True)
-    
-    if os.path.exists(xmlFile):
-        tree = XML.parse(xmlFile)
-        root = tree.getroot()
-    else:
-        root = XML.Element("gameList")  # Create root element
-        tree = XML.ElementTree(root)
-        tree.write(xmlFile, encoding="utf-8", xml_declaration=True)  # Save the empty XML file
-
-    game = XML.Element("game")
-    XML.SubElement(game, "path").text = f"./{gameName}.game".replace(" ", "_")
-    XML.SubElement(game, "name").text = f"{gameName}"
-    XML.SubElement(game, "desc").text = config["desc"]
-    XML.SubElement(game, "developer").text = config["dev"]
-   
-    root.append(game)
-
-    xml_str = XML.tostring(root, encoding="utf-8")
-    
-    parsed = minidom.parseString(xml_str)
-    with open(xmlFile, "w", encoding="utf-8") as file:
-        file.write(parsed.toprettyxml(indent="  "))
-    #System file
-    xmlFile = f"/home/drakari/ES-DE/custom_systems/es_systems.xml"
-    
-    tree = XML.parse(xmlFile)
-    root = tree.getroot()
-
-    system = XML.Element("system")
-    XML.SubElement(system, "name").text = collectionName.replace(" ", "_")
-    XML.SubElement(system, "fullname").text = collectionName
-    XML.SubElement(system, "path").text = f"%ROMPATH%/{collectionName.replace(" ", "_")}"
-    XML.SubElement(system, "extension").text = ".game"
-    XML.SubElement(system, "command").text = "/usr/bin/bash /home/drakari/launchers/launch.bash %ROM%"
-   
-    root.append(system)
-
-    xml_str = XML.tostring(root, encoding="utf-8")
-    
-    parsed = minidom.parseString(xml_str)
-    with open(xmlFile, "w", encoding="utf-8") as file:
-        file.write(parsed.toprettyxml(indent="  "))
+    saveSystemListXML(collectionName)
 
     return
 
