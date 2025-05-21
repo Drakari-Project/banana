@@ -50,7 +50,7 @@ import tempfile
 import shutil
 import logging
 
-def unzip_and_move_to_game_data(zip_path, gameDataPath):
+def unzip_and_move_to_game_data(zip_path, gameDataPath, gameName):
     # Create a temporary directory for extraction
     extract_temp = tempfile.mkdtemp(prefix="unzipped_")
 
@@ -62,19 +62,18 @@ def unzip_and_move_to_game_data(zip_path, gameDataPath):
     # Get unique top-level entries
     top_level = set(name.split('/')[0] for name in names)
 
-    # Determine base name for destination
-    zip_base_name = os.path.splitext(os.path.basename(zip_path))[0]
-    final_path = os.path.join(gameDataPath, zip_base_name)
+    # Destination path using gameName
+    final_path = os.path.join(gameDataPath, gameName.replace(" ", "_"))
 
     if len(top_level) == 1:
-        # Single folder exists already
+        # A root folder already exists
         root_candidate = os.path.join(extract_temp, next(iter(top_level)))
         if os.path.isdir(root_candidate):
             shutil.move(root_candidate, final_path)
             logging.info(f"✅ Moved existing root folder to: {final_path}")
             return final_path
 
-    # Otherwise create new folder and move everything in
+    # Otherwise, create a new folder and move all extracted contents into it
     os.makedirs(final_path, exist_ok=True)
     for item in os.listdir(extract_temp):
         item_path = os.path.join(extract_temp, item)
@@ -172,7 +171,7 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
 
     whereToMoveGame = os.path.join(gameDataPath, "game.zip")
 
-    innerFolder = unzip_and_move_to_game_data(whereToMoveGame, gameDataPath)
+    innerFolder = unzip_and_move_to_game_data(whereToMoveGame, gameDataPath, gameName)
     os.remove(whereToMoveGame)
 
     match studentGameEngine:
