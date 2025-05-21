@@ -44,29 +44,44 @@ def wait_until_file_size_is_stable(path, timeout=10, interval=0.5):
 
     return False
 
-def unzip_and_get_inner_folder(zip_path, extract_to=None):
-    if extract_to is None:
-        extract_to = os.path.splitext(zip_path)[0]
+import os
+import zipfile
+import tempfile
+import shutil
+import logging
+
+def unzip_and_ensure_single_root(zip_path):
+    # Create a temporary directory for extraction
+    extract_temp = tempfile.mkdtemp(prefix="unzipped_")
 
     # Extract all files
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_to)
-        names = zip_ref.namelist()
+        zip_ref.extractall(extract_temp)
+        names = [n for n in zip_ref.namelist() if n and not n.startswith("__MACOSX")]
 
-    # Get top-level folders, ignoring __MACOSX and empty entries
-    top_dirs = set()
-    for name in names:
-        parts = name.split('/')
-        if parts[0] and parts[0] != "__MACOSX":
-            top_dirs.add(parts[0])
+    # Get unique top-level entries
+    top_level = set(name.split('/')[0] for name in names)
 
-    if len(top_dirs) == 1:
-        inner_folder = os.path.join(extract_to, top_dirs.pop())
-        logging.info(f"✅ Extracted '{zip_path}' to '{inner_folder}'")
-        return inner_folder
-    else:
-        logging.info(f"⚠️ Extracted '{zip_path}' to '{extract_to}' (multiple folders)")
-        return extract_to
+    if len(top_level) == 1:
+        # Single root folder exists
+        root_folder = os.path.join(extract_temp, next(iter(top_level)))
+        if os.path.isdir(root_folder):
+            logging.info(f"✅ Found existing root folder: {root_folder}")
+            return root_folder
+
+    # If not, create a new folder and move everything into it
+    zip_base_name = os.path.splitext(os.path.basename(zip_path))[0]
+    new_root = os.path.join(extract_temp, zip_base_name)
+    os.makedirs(new_root, exist_ok=True)
+
+    for item in os.listdir(extract_temp):
+        item_path = os.path.join(extract_temp, item)
+        if item_path != new_root:
+            shutil.move(item_path, new_root)
+
+    logging.info(f"📁 Created new root folder: {new_root}")
+    return new_root
+
     
 def saveGameListXML(collectionName, gameName):
     xmlPath = f"/home/drakari/ES-DE/gamelists/{collectionName}/"
@@ -160,11 +175,11 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
 
     match studentGameEngine:
         case "code.org":
-            logging.info("It's code.org")
-            systemPath = '/home/drakari/systems/code.org'
+            logging.info("It's codeorg")
+            systemPath = '/home/drakari/systems/codeorg'
             Path(systemPath).mkdir(parents=True, exist_ok=True)
 
-            os.symlink(innerFolder, os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")))
+            os.symlink(os.path.join(innerFolder, "index.html"), os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")))
             os.symlink(os.path.join(systemPath, f"{gameName}.game".replace(" ", "_")), os.path.join(romPath, f"{gameName}.game".replace(" ", "_")))
         case "java":
             logging.info("It's Java")
