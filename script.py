@@ -170,7 +170,7 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
 
     whereToMoveGame = os.path.join(gameDataPath, "game.zip")
 
-    innerFolder = unzip_and_get_inner_folder(whereToMoveGame, gameDataPath)
+    innerFolder = unzip_and_ensure_single_root(whereToMoveGame, gameDataPath)
     os.remove(whereToMoveGame)
 
     match studentGameEngine:
