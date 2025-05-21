@@ -50,11 +50,11 @@ import tempfile
 import shutil
 import logging
 
-def unzip_and_ensure_single_root(zip_path):
+def unzip_and_move_to_game_data(zip_path, gameDataPath):
     # Create a temporary directory for extraction
     extract_temp = tempfile.mkdtemp(prefix="unzipped_")
 
-    # Extract all files
+    # Extract ZIP contents
     with zipfile.ZipFile(zip_path, 'r') as zip_ref:
         zip_ref.extractall(extract_temp)
         names = [n for n in zip_ref.namelist() if n and not n.startswith("__MACOSX")]
@@ -62,25 +62,27 @@ def unzip_and_ensure_single_root(zip_path):
     # Get unique top-level entries
     top_level = set(name.split('/')[0] for name in names)
 
-    if len(top_level) == 1:
-        # Single root folder exists
-        root_folder = os.path.join(extract_temp, next(iter(top_level)))
-        if os.path.isdir(root_folder):
-            logging.info(f"✅ Found existing root folder: {root_folder}")
-            return root_folder
-
-    # If not, create a new folder and move everything into it
+    # Determine base name for destination
     zip_base_name = os.path.splitext(os.path.basename(zip_path))[0]
-    new_root = os.path.join(extract_temp, zip_base_name)
-    os.makedirs(new_root, exist_ok=True)
+    final_path = os.path.join(gameDataPath, zip_base_name)
 
+    if len(top_level) == 1:
+        # Single folder exists already
+        root_candidate = os.path.join(extract_temp, next(iter(top_level)))
+        if os.path.isdir(root_candidate):
+            shutil.move(root_candidate, final_path)
+            logging.info(f"✅ Moved existing root folder to: {final_path}")
+            return final_path
+
+    # Otherwise create new folder and move everything in
+    os.makedirs(final_path, exist_ok=True)
     for item in os.listdir(extract_temp):
         item_path = os.path.join(extract_temp, item)
-        if item_path != new_root:
-            shutil.move(item_path, new_root)
+        if os.path.abspath(item_path) != os.path.abspath(final_path):
+            shutil.move(item_path, final_path)
 
-    logging.info(f"📁 Created new root folder: {new_root}")
-    return new_root
+    logging.info(f"📁 Created and moved new root folder to: {final_path}")
+    return final_path
 
     
 def saveGameListXML(collectionName, gameName):
@@ -170,7 +172,7 @@ def saveStudentGame(collectionName, gameName, studentGameEngine):
 
     whereToMoveGame = os.path.join(gameDataPath, "game.zip")
 
-    innerFolder = unzip_and_ensure_single_root(whereToMoveGame, gameDataPath)
+    innerFolder = unzip_and_move_to_game_data(whereToMoveGame, gameDataPath)
     os.remove(whereToMoveGame)
 
     match studentGameEngine:
